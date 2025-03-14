@@ -21,6 +21,56 @@ public interface DaxListener extends ParseTreeListener {
 	 */
 	void exitDaxExpression(DaxParser.DaxExpressionContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link DaxParser#measureAssignment}.
+	 * @param ctx the parse tree
+	 */
+	void enterMeasureAssignment(DaxParser.MeasureAssignmentContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link DaxParser#measureAssignment}.
+	 * @param ctx the parse tree
+	 */
+	void exitMeasureAssignment(DaxParser.MeasureAssignmentContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link DaxParser#daxStatement}.
+	 * @param ctx the parse tree
+	 */
+	void enterDaxStatement(DaxParser.DaxStatementContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link DaxParser#daxStatement}.
+	 * @param ctx the parse tree
+	 */
+	void exitDaxStatement(DaxParser.DaxStatementContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link DaxParser#evaluateBlock}.
+	 * @param ctx the parse tree
+	 */
+	void enterEvaluateBlock(DaxParser.EvaluateBlockContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link DaxParser#evaluateBlock}.
+	 * @param ctx the parse tree
+	 */
+	void exitEvaluateBlock(DaxParser.EvaluateBlockContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link DaxParser#varDeclaration}.
+	 * @param ctx the parse tree
+	 */
+	void enterVarDeclaration(DaxParser.VarDeclarationContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link DaxParser#varDeclaration}.
+	 * @param ctx the parse tree
+	 */
+	void exitVarDeclaration(DaxParser.VarDeclarationContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link DaxParser#returnStatement}.
+	 * @param ctx the parse tree
+	 */
+	void enterReturnStatement(DaxParser.ReturnStatementContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link DaxParser#returnStatement}.
+	 * @param ctx the parse tree
+	 */
+	void exitReturnStatement(DaxParser.ReturnStatementContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link DaxParser#expression}.
 	 * @param ctx the parse tree
 	 */
@@ -60,6 +110,16 @@ public interface DaxListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitArgumentList(DaxParser.ArgumentListContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link DaxParser#operator}.
+	 * @param ctx the parse tree
+	 */
+	void enterOperator(DaxParser.OperatorContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link DaxParser#operator}.
+	 * @param ctx the parse tree
+	 */
+	void exitOperator(DaxParser.OperatorContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link DaxParser#daxFunction}.
 	 * @param ctx the parse tree

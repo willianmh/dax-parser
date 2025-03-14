@@ -20,6 +20,36 @@ public interface DaxVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitDaxExpression(DaxParser.DaxExpressionContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link DaxParser#measureAssignment}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitMeasureAssignment(DaxParser.MeasureAssignmentContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link DaxParser#daxStatement}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitDaxStatement(DaxParser.DaxStatementContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link DaxParser#evaluateBlock}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitEvaluateBlock(DaxParser.EvaluateBlockContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link DaxParser#varDeclaration}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitVarDeclaration(DaxParser.VarDeclarationContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link DaxParser#returnStatement}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitReturnStatement(DaxParser.ReturnStatementContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link DaxParser#expression}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
@@ -43,6 +73,12 @@ public interface DaxVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitArgumentList(DaxParser.ArgumentListContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link DaxParser#operator}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitOperator(DaxParser.OperatorContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link DaxParser#daxFunction}.
 	 * @param ctx the parse tree

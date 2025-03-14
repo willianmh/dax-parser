@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>DAX Dependency Analyzer</title>
+    <!-- Include Bulma CSS via CDN -->
+    <link
+            rel="stylesheet"
+            href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css"
+    >
+    <!-- (Optionally) Add custom style overrides in a <style> block or separate .css file -->
+    <style>
+        /* Minimal overrides (optional) */
+        body {
+            background-color: #f2f2f2;
+        }
+        #parseTreeContent {
+            white-space: pre; /* preserve indentation on parse tree output */
+        }
+    </style>
+</head>
+<body>
+<!-- Hero/heading area -->
+<section class="hero is-primary is-bold">
+    <div class="hero-body">
+        <div class="container">
+            <h1 class="title has-text-centered">
+                DAX Dependency Analyzer
+            </h1>
+        </div>
+    </div>
+</section>
+
+<!-- Main content area -->
+<section class="section">
+    <div class="container">
+        <!-- A card (Bulma "box") to contain the DAX form and results -->
+        <div class="box">
+            <form id="daxForm">
+                <!-- Text area for DAX expression input -->
+                <div class="field">
+                    <label class="label">DAX Expression</label>
+                    <div class="control">
+              <textarea
+                      id="daxExpression"
+                      class="textarea"
+                      rows="5"
+                      placeholder="Enter your DAX expression here..."
+              ></textarea>
+                    </div>
+                </div>
+
+                <!-- Button group -->
+                <div class="field is-grouped">
+                    <div class="control">
+                        <button class="button is-link" type="submit" id="analyzeButton">
+                            Analyze Dependencies
+                        </button>
+                    </div>
+                    <div class="control">
+                        <button class="button is-info" type="button" id="tokenButton">
+                            Show Tokens
+                        </button>
+                    </div>
+                    <div class="control">
+                        <button class="button is-primary" type="button" id="parseTreeButton">
+                            Show Parse Tree
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- Results section -->
+        <div class="columns is-multiline">
+            <!-- Dependencies -->
+            <div class="column is-12">
+                <article class="message is-light">
+                    <div class="message-header">
+                        <p>Dependencies</p>
+                    </div>
+                    <div class="message-body" id="dependencyContent">
+                        <!-- Filled dynamically by JavaScript -->
+                    </div>
+                </article>
+            </div>
+
+            <!-- Tokens -->
+            <div class="column is-12">
+                <article class="message is-light">
+                    <div class="message-header">
+                        <p>Tokens</p>
+                    </div>
+                    <div class="message-body" id="tokenContent">
+                        <!-- Filled dynamically by JavaScript -->
+                    </div>
+                </article>
+            </div>
+
+            <!-- Parse Tree -->
+            <div class="column is-12">
+                <article class="message is-light">
+                    <div class="message-header">
+                        <p>Parse Tree</p>
+                    </div>
+                    <div class="message-body">
+                        <pre id="parseTreeContent" style="max-height: 400px; overflow:auto;"></pre>
+                    </div>
+                </article>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+    // References to DOM elements
+    const form = document.getElementById('daxForm');
+    const expressionTextarea = document.getElementById('daxExpression');
+    const dependencyContent = document.getElementById('dependencyContent');
+    const tokenContent = document.getElementById('tokenContent');
+    const parseTreeContent = document.getElementById('parseTreeContent');
+
+    // 1) Handle Dependencies (on form submit)
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const expression = expressionTextarea.value.trim();
+        dependencyContent.innerHTML = ''; // Clear old results
+
+        if (!expression) {
+            dependencyContent.innerHTML =
+                '<p class="has-text-danger">Please enter a DAX expression.</p>';
+            return;
+        }
+
+        try {
+            const response = await fetch('/api/dax/dependencies', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ expression })
+            });
+
+            if (!response.ok) {
+                throw new Error('Error from server: ' + response.status);
+            }
+
+            const data = await response.json(); // Array of { table, field }
+            if (!data || data.length === 0) {
+                dependencyContent.innerHTML = '<p>No dependencies found.</p>';
+            } else {
+                dependencyContent.innerHTML =
+                    `<ul>${data.map(dep => `
+              <li>${dep.table ?? '(no table)'} : ${dep.field}</li>
+            `).join('')}</ul>`;
+            }
+        } catch (err) {
+            console.error(err);
+            dependencyContent.innerHTML =
+                '<p class="has-text-danger">Error analyzing expression.</p>';
+        }
+    });
+
+    // 2) Show Tokens
+    document.getElementById('tokenButton').addEventListener('click', async () => {
+        const expression = expressionTextarea.value.trim();
+        tokenContent.innerHTML = '';
+
+        if (!expression) {
+            tokenContent.innerHTML =
+                '<p class="has-text-danger">Please enter a DAX expression.</p>';
+            return;
+        }
+
+        try {
+            const response = await fetch('/api/dax/tokens', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ expression })
+            });
+
+            if (!response.ok) {
+                throw new Error('Error from server: ' + response.status);
+            }
+
+            const tokens = await response.json();
+            if (!tokens || tokens.length === 0) {
+                tokenContent.innerHTML = '<p>No tokens found.</p>';
+            } else {
+                tokenContent.innerHTML =
+                    `<ul>${tokens.map(t => `<li>${t}</li>`).join('')}</ul>`;
+            }
+        } catch (err) {
+            console.error(err);
+            tokenContent.innerHTML =
+                '<p class="has-text-danger">Error fetching tokens.</p>';
+        }
+    });
+
+    // 3) Show Parse Tree
+    document.getElementById('parseTreeButton').addEventListener('click', async () => {
+        const expression = expressionTextarea.value.trim();
+        parseTreeContent.textContent = '';
+
+        if (!expression) {
+            parseTreeContent.textContent = 'Please enter a DAX expression.';
+            return;
+        }
+
+        try {
+            const response = await fetch('/api/dax/parseTree', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ expression })
+            });
+
+            if (!response.ok) {
+                throw new Error('Error from server: ' + response.status);
+            }
+
+            const treeString = await response.text(); // Plain text
+            parseTreeContent.textContent = treeString;
+        } catch (err) {
+            console.error(err);
+            parseTreeContent.textContent = 'Error fetching parse tree.';
+        }
+    });
+</script>
+</body>
+</html>
